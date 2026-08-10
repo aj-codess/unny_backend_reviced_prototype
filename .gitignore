@@ -1,2 +1,10 @@
-node_modules
-package-lock.json
+node_modules/
+.env
+.env.local
+dist/
+*.log
+npm-debug.log*
+src/generated/
+prisma/dev.db
+.DS_Store
+coverage/

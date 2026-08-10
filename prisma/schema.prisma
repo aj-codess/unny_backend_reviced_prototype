@@ -1,0 +1,335 @@
+// Unny — Final Year Project Archive Platform
+// Prisma schema — PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum Role {
+  STUDENT
+  SUPERVISOR
+}
+
+enum ProjectStatus {
+  DRAFT
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum CollaboratorRole {
+  OWNER
+  COLLABORATOR
+}
+
+enum CollaboratorStatus {
+  INVITED
+  ACCEPTED
+  DECLINED
+}
+
+enum SupervisionStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+enum ReviewAction {
+  APPROVED
+  REJECTED
+  COMMENTED
+}
+
+enum TagCategory {
+  LANGUAGE
+  FRAMEWORK
+  DOMAIN
+  TOOL
+  METHODOLOGY
+}
+
+enum NotificationType {
+  SUBMISSION_RECEIVED
+  REVIEW_DECISION
+  COLLABORATION_INVITE
+  COLLABORATION_RESPONSE
+  SUPERVISION_REQUEST
+  SUPERVISION_RESPONSE
+  COMMENT
+}
+
+enum DevicePlatform {
+  IOS
+  ANDROID
+  WEB
+}
+
+// ---------------------------------------------------------------------------
+// Core identity
+// ---------------------------------------------------------------------------
+
+model User {
+  id              String   @id @default(uuid())
+  email           String   @unique
+  passwordHash    String
+  role            Role
+  isEmailVerified Boolean  @default(false)
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  profile Profile?
+
+  // Projects this user owns/submitted (students)
+  ownedProjects Project[] @relation("SubmittedProjects")
+
+  // Projects this user supervises (supervisors)
+  supervisedProjects Project[] @relation("SupervisedProjects")
+
+  collaborations ProjectCollaborator[]
+  reviews        Review[]
+
+  supervisionRequestsSent     SupervisionRequest[] @relation("SupervisionRequester")
+  supervisionRequestsReceived SupervisionRequest[] @relation("SupervisionSupervisor")
+
+  notifications Notification[]
+  deviceTokens  DeviceToken[]
+  refreshTokens RefreshToken[]
+  bookmarks     Bookmark[]
+  comments      Comment[]
+
+  @@index([role])
+  @@map("users")
+}
+
+model Profile {
+  id     String @id @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  fullName  String
+  avatarUrl String?
+  bio       String?
+
+  department String
+  faculty    String?
+  phone      String?
+
+  // Student-only fields
+  matricNumber String? @unique
+  level        String?
+
+  // Supervisor-only fields
+  staffId        String? @unique
+  specialization String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("profiles")
+}
+
+// ---------------------------------------------------------------------------
+// Projects
+// ---------------------------------------------------------------------------
+
+model Project {
+  id           String        @id @default(uuid())
+  title        String
+  abstract     String
+  academicYear Int
+  department   String
+  status       ProjectStatus @default(DRAFT)
+
+  fileUrl String? // last known signed/public URL (informational)
+  fileKey String? // canonical S3 object key
+  repoUrl String?
+  demoUrl String?
+
+  certificateKey String? // S3 key of generated approval certificate
+
+  submittedById String
+  submittedBy   User   @relation("SubmittedProjects", fields: [submittedById], references: [id])
+
+  supervisorId String?
+  supervisor   User?   @relation("SupervisedProjects", fields: [supervisorId], references: [id])
+
+  submittedAt DateTime?
+  reviewedAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tags                ProjectTag[]
+  collaborators       ProjectCollaborator[]
+  reviews             Review[]
+  supervisionRequests SupervisionRequest[]
+  bookmarks           Bookmark[]
+  comments            Comment[]
+
+  @@index([status])
+  @@index([department])
+  @@index([academicYear])
+  @@index([submittedById])
+  @@map("projects")
+}
+
+model ProjectCollaborator {
+  id        String              @id @default(uuid())
+  projectId String
+  project   Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      CollaboratorRole    @default(COLLABORATOR)
+  status    CollaboratorStatus  @default(INVITED)
+
+  invitedAt   DateTime  @default(now())
+  respondedAt DateTime?
+
+  @@unique([projectId, userId])
+  @@map("project_collaborators")
+}
+
+model Tag {
+  id       String       @id @default(uuid())
+  name     String       @unique
+  category TagCategory
+  projects ProjectTag[]
+
+  @@map("tags")
+}
+
+model ProjectTag {
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tagId     String
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, tagId])
+  @@map("project_tags")
+}
+
+// ---------------------------------------------------------------------------
+// Review / moderation workflow
+// ---------------------------------------------------------------------------
+
+model Review {
+  id         String       @id @default(uuid())
+  projectId  String
+  project    Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  reviewerId String
+  reviewer   User         @relation(fields: [reviewerId], references: [id])
+  action     ReviewAction
+  comment    String?
+  createdAt  DateTime     @default(now())
+
+  @@index([projectId])
+  @@map("reviews")
+}
+
+model SupervisionRequest {
+  id           String             @id @default(uuid())
+  projectId    String
+  project      Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  requesterId  String
+  requester    User               @relation("SupervisionRequester", fields: [requesterId], references: [id])
+  supervisorId String
+  supervisor   User               @relation("SupervisionSupervisor", fields: [supervisorId], references: [id])
+  status       SupervisionStatus  @default(PENDING)
+  message      String?
+
+  createdAt   DateTime  @default(now())
+  respondedAt DateTime?
+
+  @@unique([projectId, supervisorId])
+  @@map("supervision_requests")
+}
+
+// ---------------------------------------------------------------------------
+// Engagement
+// ---------------------------------------------------------------------------
+
+model Bookmark {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, projectId])
+  @@map("bookmarks")
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  body      String
+  createdAt DateTime @default(now())
+
+  @@index([projectId])
+  @@map("comments")
+}
+
+// ---------------------------------------------------------------------------
+// Notifications / push
+// ---------------------------------------------------------------------------
+
+model Notification {
+  id               String           @id @default(uuid())
+  userId           String
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type             NotificationType
+  title            String
+  message          String
+  isRead           Boolean          @default(false)
+  relatedProjectId String?
+  metadata         Json?
+  createdAt        DateTime         @default(now())
+
+  @@index([userId, isRead])
+  @@map("notifications")
+}
+
+model DeviceToken {
+  id        String         @id @default(uuid())
+  userId    String
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String         @unique
+  platform  DevicePlatform
+  createdAt DateTime       @default(now())
+
+  @@map("device_tokens")
+}
+
+// ---------------------------------------------------------------------------
+// Auth session management
+// ---------------------------------------------------------------------------
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  userAgent String?
+  ipAddress String?
+  isRevoked Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
