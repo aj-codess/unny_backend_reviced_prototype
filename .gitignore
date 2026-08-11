@@ -8,3 +8,4 @@ src/generated/
 prisma/dev.db
 .DS_Store
 coverage/
+package-lock.json
