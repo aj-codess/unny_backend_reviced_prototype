@@ -1,8 +1,11 @@
 // Seeds a baseline tag taxonomy so the Explore/Search screens have facets
 // to filter on from day one. Run with: node prisma/seed.js
+import 'dotenv/config';
+import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../src/generated/prisma/index.js';
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+const prisma = new PrismaClient({ adapter });
 
 const TAGS = [
   { name: 'JavaScript', category: 'LANGUAGE' },
