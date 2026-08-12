@@ -2,7 +2,7 @@ import prisma from '../config/db.js';
 import { ApiError } from '../utils/ApiError.js';
 import { getPagination, buildMeta } from '../utils/pagination.js';
 import { resolveTagIds } from './tag.service.js';
-import { removeObject } from './s3.service.js';
+import { removeObject } from './storage.service.js';
 
 const projectListSelect = {
   id: true,

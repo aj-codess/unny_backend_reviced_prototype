@@ -1,8 +1,8 @@
 {
   "info": {
-    "_postman_id": "05c8be4b-2c82-4822-a45c-350caf3e0fd0",
+    "_postman_id": "dcf3c60c-dc29-4e5f-99f3-fa09e0051ebe",
     "name": "Unny API",
-    "description": "Final year project archive & collaboration platform.\n\nRun folders top-to-bottom against the Unny Local environment: 01 Auth creates a student, a second collaborator student, and a supervisor and stores their tokens automatically. Later folders chain off the ids/tokens those requests save into the environment (projectId, tagId, collaborationId, supervisionRequestId, uploadKey, notificationId), so running requests out of order will fail until their dependencies have run once.\n\nTypical happy-path demo order:\n1. Auth: register student, collaborator, supervisor\n2. Tags: create a tag\n3. Projects: create draft project\n4. Uploads: presign project file (simulates attaching the report)\n5. Supervision: request supervision -> supervisor accepts\n6. Projects: submit project for review\n7. Reviews: supervisor approves\n8. Projects: explore -> the project now appears in the public archive",
+    "description": "Final year project archive & collaboration platform.\n\nRun folders top-to-bottom against the Unny Local environment: 01 Auth creates a student, a second collaborator student, and a supervisor and stores their tokens automatically. Later folders chain off the ids/tokens those requests save into the environment (projectId, tagId, collaborationId, supervisionRequestId, uploadKey, notificationId), so running requests out of order will fail until their dependencies have run once.\n\nTypical happy-path demo order:\n1. Auth: register student, collaborator, supervisor\n2. Tags: create a tag\n3. Projects: create draft project\n4. Uploads: presign project file (simulates attaching the report)\n5. Supervision: request supervision -> supervisor accepts\n6. Projects: submit project for review\n7. Reviews: supervisor approves\n8. Projects: explore -> the project now appears in the public archive\n\nv1.1 \u2014 added '10 Local Storage Fallback' folder covering the S3/local-disk auto-fallback upload path.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -2474,6 +2474,175 @@
         }
       ],
       "description": ""
+    },
+    {
+      "name": "10 Local Storage Fallback",
+      "item": [
+        {
+          "name": "Presign Project File Upload (S3 or Local \u2014 auto)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/uploads/project-file",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "uploads",
+                "project-file"
+              ]
+            },
+            "description": "Same endpoint as the one in the '05 Uploads' folder \u2014 duplicated here so this folder can be run standalone. The backend decides S3 vs. local automatically based on whether AWS_S3_BUCKET/credentials are set (src/services/storage.service.js). This request detects which one you got back and stores it in {{storageBackend}}.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"fileName\": \"final-year-report.pdf\",\n  \"contentType\": \"application/pdf\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "if (json.success && json.data) {",
+                  "    pm.environment.set('uploadUrl', json.data.uploadUrl);",
+                  "    pm.environment.set('uploadKey', json.data.key);",
+                  "    const isLocal = json.data.uploadUrl.includes('/local-storage/');",
+                  "    pm.environment.set('storageBackend', isLocal ? 'local' : 's3');",
+                  "    console.log('Storage backend in use:', isLocal ? 'local disk (S3 not configured)' : 'S3');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Upload File To Storage (S3 or Local)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/pdf"
+              }
+            ],
+            "url": {
+              "raw": "{{uploadUrl}}",
+              "host": [
+                "{{uploadUrl}}"
+              ],
+              "path": []
+            },
+            "description": "PUTs the raw file body directly to the presigned/signed URL captured by the previous request \u2014 no Bearer token needed, exactly like an S3 presigned PUT (the URL itself is the credential). Works unchanged whether {{uploadUrl}} points at S3 or at this server's own /local-storage route.\n\nMANUAL STEP: in the Body tab, click 'Select File' and choose a real PDF before sending \u2014 Postman cannot attach a file to a raw PUT body from a collection JSON file automatically.\n\nIf {{storageBackend}} is 'local', the file is written under LOCAL_STORAGE_DIR on the server (default storage/uploads) with a signature + expiry check enforced by src/routes/local-storage.routes.js.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "file",
+              "file": {
+                "src": []
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Upload succeeded', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Project (Confirm File Attached)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "{{projectId}}"
+              ]
+            },
+            "description": "Reuses the standard project-detail endpoint to confirm fileKey/fileUrl were recorded regardless of which storage backend handled the upload.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response has success envelope', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success', true);",
+                  "});",
+                  "pm.test('Project has a fileKey recorded', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.data.fileKey).to.be.a('string').and.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Exercises the automatic S3 -> local-disk fallback added to the storage layer. Run '01 Auth' and '04 Projects > Create Project (Draft)' first so {{projectId}} is set."
     }
   ]
 }

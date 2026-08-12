@@ -1,12 +1,12 @@
 import { Document, Packer, Paragraph, TextRun, AlignmentType } from 'docx';
-import { config } from '../config/env.js';
-import { putObjectBuffer } from '../config/s3.js';
+import { putObjectBuffer } from './storage.service.js';
 import { logger } from '../utils/logger.js';
 
 /**
- * Generates a .docx certificate of approval for a project and uploads it
- * to object storage. Returns the S3 key, or null if S3 isn't configured
- * (kept non-fatal so approving a project never fails because of this).
+ * Generates a .docx certificate of approval for a project and stores it via
+ * the storage facade (S3 if configured, otherwise local disk). Errors here
+ * are logged but never thrown — certificate generation is a nice-to-have
+ * and must never block a review decision.
  */
 export const generateApprovalCertificate = async ({
   projectId,
@@ -16,8 +16,8 @@ export const generateApprovalCertificate = async ({
   academicYear,
   supervisorName,
 }) => {
-  if (!config.aws.bucket) {
-    logger.warn('AWS_S3_BUCKET not configured — skipping certificate generation');
+  if (!studentName || !projectTitle) {
+    logger.warn('generateApprovalCertificate called with missing student/project info — skipping');
     return null;
   }
 

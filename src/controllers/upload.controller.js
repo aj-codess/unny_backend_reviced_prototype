@@ -2,7 +2,8 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { success } from '../utils/ApiResponse.js';
 import { ApiError } from '../utils/ApiError.js';
 import prisma from '../config/db.js';
-import { buildAvatarKey, buildProjectFileKey, presignUpload } from '../services/s3.service.js';
+import { buildAvatarKey, buildProjectFileKey } from '../services/s3.service.js';
+import { presignUpload } from '../services/storage.service.js';
 import { attachProjectFile } from '../services/project.service.js';
 
 /**
