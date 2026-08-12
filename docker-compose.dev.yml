@@ -1,0 +1,23 @@
+# Development overlay — usage:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+#
+# Mounts your local source into the container and runs `npm run dev`
+# (nodemon) so edits on the host restart the server automatically, just
+# like `npm run dev` in the manual setup guide — but PostgreSQL still runs
+# in its own container, so nobody needs Postgres installed on the host.
+
+services:
+  backend:
+    build:
+      target: dev
+    volumes:
+      - .:/app
+      # Anonymous volumes: keep the container's own node_modules and
+      # generated Prisma client, don't let the host bind mount (which
+      # doesn't have them, or has host-incompatible native builds) shadow
+      # them.
+      - /app/node_modules
+      - /app/src/generated
+      - unny-uploads:/app/storage/uploads
+    environment:
+      NODE_ENV: development

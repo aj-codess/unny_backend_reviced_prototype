@@ -1,0 +1,15 @@
+node_modules
+npm-debug.log*
+src/generated
+.env
+.env.local
+.env.docker
+.git
+.gitignore
+.DS_Store
+coverage
+storage/uploads
+*.md
+Unny-Backend-Setup-Guide.docx
+Unny_postman_collection.json
+Unny-Local.postman_environment.json
