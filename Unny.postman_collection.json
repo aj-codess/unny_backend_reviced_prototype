@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "dcf3c60c-dc29-4e5f-99f3-fa09e0051ebe",
+    "_postman_id": "05c8be4b-2c82-4822-a45c-350caf3e0fd0",
     "name": "Unny API",
     "description": "Final year project archive & collaboration platform.\n\nRun folders top-to-bottom against the Unny Local environment: 01 Auth creates a student, a second collaborator student, and a supervisor and stores their tokens automatically. Later folders chain off the ids/tokens those requests save into the environment (projectId, tagId, collaborationId, supervisionRequestId, uploadKey, notificationId), so running requests out of order will fail until their dependencies have run once.\n\nTypical happy-path demo order:\n1. Auth: register student, collaborator, supervisor\n2. Tags: create a tag\n3. Projects: create draft project\n4. Uploads: presign project file (simulates attaching the report)\n5. Supervision: request supervision -> supervisor accepts\n6. Projects: submit project for review\n7. Reviews: supervisor approves\n8. Projects: explore -> the project now appears in the public archive\n\nv1.1 \u2014 added '10 Local Storage Fallback' folder covering the S3/local-disk auto-fallback upload path.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -2567,7 +2567,7 @@
             "body": {
               "mode": "file",
               "file": {
-                "src": []
+                "src": null
               }
             }
           },
