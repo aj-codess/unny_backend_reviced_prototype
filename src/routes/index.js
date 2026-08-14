@@ -7,6 +7,7 @@ import supervisionRequestRoutes from './supervision-requests.routes.js';
 import tagRoutes from './tag.routes.js';
 import notificationRoutes from './notification.routes.js';
 import uploadRoutes from './upload.routes.js';
+import exploreRoutes from './explore.routes.js';
 
 const router = Router();
 
@@ -18,5 +19,6 @@ router.use('/supervision-requests', supervisionRequestRoutes);
 router.use('/tags', tagRoutes);
 router.use('/notifications', notificationRoutes);
 router.use('/uploads', uploadRoutes);
+router.use('/explore', exploreRoutes);
 
 export default router;

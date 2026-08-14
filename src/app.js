@@ -5,6 +5,8 @@ import { config } from './config/env.js';
 import router from './routes/index.js';
 import localStorageRoutes from './routes/local-storage.routes.js';
 import { notFound, errorHandler } from './middleware/error.middleware.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 const app = express();
 
@@ -13,6 +15,13 @@ app.use(cors({ origin: config.corsOrigin, credentials: true }));
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+app.get('/love_Berita', (req, res) => {
+    res.sendFile(path.join(__dirname, './../for-her.html'));
+});
 
 app.get('/health', (req, res) => res.status(200).json({ status: 'ok', env: config.env }));
 
