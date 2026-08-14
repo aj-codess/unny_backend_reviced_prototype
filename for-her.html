@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For You</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,440;0,9..144,600;1,9..144,380;1,9..144,500&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:        #0a0f1c;
+    --ink-2:      #131c30;
+    --gold:       #c9974f;
+    --gold-light: #ecd9b5;
+    --rose:       #e2a9a3;
+    --parchment:  #f7f0e2;
+    --parchment-2:#ecdec0;
+    --line:       rgba(201,151,79,.32);
+    --mist:       rgba(236,217,181,.07);
+  }
+
+  *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    background: var(--ink);
+    color: var(--parchment);
+    font-family:'Inter', sans-serif;
+    overflow-x:hidden;
+  }
+
+  body::after{
+    content:"";
+    position:fixed; inset:0; pointer-events:none; z-index:50;
+    opacity:.05; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ================= HERO / ROUTE SCENE ================= */
+  .hero{
+    position:relative;
+    min-height:100svh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding: 8vh 6vw 10vh;
+    background:
+      radial-gradient(1100px 650px at 15% -8%, rgba(201,151,79,.14), transparent 60%),
+      radial-gradient(900px 620px at 100% 105%, rgba(226,169,163,.10), transparent 55%),
+      linear-gradient(180deg, var(--ink) 0%, var(--ink-2) 100%);
+    overflow:hidden;
+  }
+
+  #stars{ position:absolute; inset:0; z-index:0; pointer-events:none; }
+  .star{
+    position:absolute; background:var(--gold-light); border-radius:50%;
+    opacity:.3; animation: twinkle 5s ease-in-out infinite;
+  }
+  @keyframes twinkle{ 0%,100%{opacity:.12} 50%{opacity:.65} }
+
+  .eyebrow{
+    position:relative; z-index:1;
+    font-family:'Space Mono', monospace;
+    font-size:11px; letter-spacing:.3em; text-transform:uppercase;
+    color: var(--gold-light); opacity:0;
+    animation: fadeUp .8s ease forwards .1s;
+    margin-bottom: 22px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow .coord{ opacity:.55; }
+  .eyebrow::before, .eyebrow::after{
+    content:""; height:1px; width:28px; background: var(--line);
+  }
+
+  h1.headline{
+    position:relative; z-index:1;
+    font-family:'Fraunces', serif;
+    font-weight:440; font-style:italic;
+    font-size: clamp(32px, 6.4vw, 58px);
+    line-height:1.14; text-align:center;
+    max-width:15ch;
+    margin: 0 0 16px;
+    opacity:0; transform: translateY(14px);
+    animation: fadeUp .9s cubic-bezier(.2,.8,.2,1) forwards .3s;
+  }
+  h1.headline em{ color: var(--gold); font-style:italic; }
+
+  .sub{
+    position:relative; z-index:1;
+    font-size:14.5px; line-height:1.7; text-align:center; max-width:36ch;
+    color: rgba(247,240,226,.55);
+    opacity:0; animation: fadeUp .9s ease forwards .5s;
+    margin-bottom: 54px;
+  }
+
+  @keyframes fadeUp{ to{ opacity:1; transform:translateY(0); } }
+
+  .route-wrap{
+    position:relative; z-index:1; width:100%; max-width:520px;
+  }
+  svg.route{ width:100%; height:auto; display:block; overflow:visible; }
+  .route-track{
+    fill:none; stroke: var(--line); stroke-width:2; stroke-linecap:round;
+    stroke-dasharray: 5 11;
+  }
+  .route-draw{
+    fill:none; stroke: var(--gold); stroke-width:2.4; stroke-linecap:round;
+    filter: drop-shadow(0 0 7px rgba(201,151,79,.55));
+  }
+  .node{ fill: var(--ink-2); stroke: var(--line); stroke-width:2; }
+  .node.origin{ fill:var(--rose); stroke:var(--rose); }
+  .node.dest{ fill:var(--gold); stroke:var(--gold); }
+  .pin{
+    opacity:0; transform: translateY(-6px) scale(.7); transform-origin:center;
+    transition: opacity .4s ease, transform .4s cubic-bezier(.3,1.4,.5,1);
+  }
+  .pin.show{ opacity:1; transform: translateY(0) scale(1); }
+
+  .scroll-cue{
+    position:relative; z-index:1; margin-top: 58px;
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+    opacity:0; animation: fadeUp .8s ease forwards 2.6s;
+  }
+  .scroll-cue span{
+    font-family:'Space Mono', monospace; font-size:10.5px; letter-spacing:.24em;
+    text-transform:uppercase; color: rgba(247,240,226,.4);
+  }
+  .chevron{
+    width:14px; height:14px; border-right:1px solid var(--gold); border-bottom:1px solid var(--gold);
+    transform: rotate(45deg); animation: bob 1.8s ease-in-out infinite;
+  }
+  @keyframes bob{ 0%,100%{ transform: rotate(45deg) translate(0,0);} 50%{ transform: rotate(45deg) translate(4px,4px);} }
+
+  /* ================= LETTER SCENE ================= */
+  .letter-stage{
+    position:relative;
+    min-height:100svh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding: 12vh 6vw 14vh;
+    background:
+      radial-gradient(800px 500px at 50% 0%, rgba(201,151,79,.08), transparent 60%),
+      var(--ink-2);
+  }
+
+  .seal-scene{ margin-bottom:14px; }
+  .seal{
+    width:60px; height:60px; border-radius:50%;
+    background: radial-gradient(circle at 34% 28%, #dd9a6b, #a0562f 72%);
+    box-shadow: 0 10px 26px rgba(0,0,0,.45);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .seal svg{ width:24px; height:24px; opacity:.85; }
+
+  .letter{
+    width:100%; max-width:600px;
+    background: linear-gradient(180deg, var(--parchment) 0%, var(--parchment-2) 100%);
+    color: #2a2016;
+    border-radius: 4px;
+    padding: 56px 48px 46px;
+    box-shadow: 0 40px 90px rgba(0,0,0,.5), 0 2px 0 rgba(255,255,255,.5) inset;
+    position:relative;
+    will-change: transform;
+    transition: transform .25s ease-out;
+  }
+  .letter::before{
+    content:""; position:absolute; inset:11px;
+    border: 1px solid rgba(160,86,47,.18); border-radius:2px; pointer-events:none;
+  }
+  .letter .to{
+    font-family:'Space Mono', monospace; font-size:11px; letter-spacing:.22em; text-transform:uppercase;
+    color:#a0562f; margin-bottom:6px;
+  }
+  .letter .date{
+    font-family:'Space Mono', monospace; font-size:11px; color:rgba(58,42,23,.4);
+    margin-bottom: 26px;
+  }
+  .letter p{
+    font-family:'Fraunces', serif; font-weight:340; font-size:18.5px; line-height:1.85;
+    margin: 0 0 20px; color:#3a2a17;
+  }
+  .letter p::first-letter{
+    font-family:'Fraunces', serif; font-weight:500; font-style:italic;
+    font-size: 3.1em; float:left; line-height:.78; padding: .04em .07em 0 0;
+    color:#a0562f;
+  }
+  .letter .sign{
+    font-family:'Fraunces', serif; font-style:italic; font-size:20px;
+    margin-top: 30px; color:#a0562f; display:flex; align-items:center; gap:12px;
+  }
+  .letter .sign svg{ width:22px; height:18px; }
+
+  .footer-note{
+    margin-top: 40px; text-align:center;
+    font-family:'Space Mono', monospace; font-size:10.5px; letter-spacing:.16em;
+    color: rgba(247,240,226,.28);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+  }
+
+  @media (max-width:480px){
+    .letter{ padding: 42px 26px 34px; }
+    .letter p{ font-size:17px; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ============ SCENE 1: THE ROUTE ============ -->
+  <section class="hero">
+    <div id="stars"></div>
+
+    <div class="eyebrow"><span class="coord">5.614818°N, 0.205874°W</span></div>
+    <h1 class="headline">Am Going To Be Vulnerable<br>With <em>you</em> Today.</h1>
+    <p class="sub">Beryl Eyeson-Ghansah</p>
+
+    <div class="route-wrap">
+      <svg class="route" viewBox="0 0 460 130" xmlns="http://www.w3.org/2000/svg">
+        <path class="route-track" d="M20,95 C 110,15 170,120 240,65 S 380,15 440,45"/>
+        <path id="drawPath" class="route-draw" d="M20,95 C 110,15 170,120 240,65 S 380,15 440,45"/>
+        <circle class="node origin" cx="20" cy="95" r="6"/>
+        <circle class="node dest" cx="440" cy="45" r="6"/>
+        <g class="pin" id="pin" transform="translate(440,45)">
+          <path d="M0,-26 C8,-26 13,-19 13,-12 C13,-3 0,10 0,10 C0,10 -13,-3 -13,-12 C-13,-19 -8,-26 0,-26 Z" fill="#e2a9a3"/>
+          <circle cx="0" cy="-13" r="4" fill="#0a0f1c"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="scroll-cue">
+      <span>keep going</span>
+      <div class="chevron"></div>
+    </div>
+  </section>
+
+  <!-- ============ SCENE 2: THE LETTER ============ -->
+  <section class="letter-stage">
+    <div class="seal-scene">
+      <div class="seal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#3a2a17" stroke-width="1.6"><path d="M12 21s-7.5-4.6-9.5-9.1C1 8.2 3 5 6.4 5c2 0 3.3 1.1 4.6 2.7C12.3 6.1 13.6 5 15.6 5 19 5 21 8.2 19.5 11.9 17.5 16.4 12 21 12 21z"/></svg>
+      </div>
+    </div>
+
+    <div class="letter" id="letterCard">
+      <div class="to">To you, wherever this finds you <br> The AI is not supposed to make the design too spicy but it did anyways.. lol😂</div>
+      <div class="date">18 August</div>
+
+      <!-- ======================================================= -->
+      <!-- ✍️  HARDCODE YOUR MESSAGE HERE.                          -->
+      <!-- Replace the text inside each <p> tag below.              -->
+      <!-- Add or remove <p>...</p> blocks for more/fewer paragraphs -->
+      <!-- The first letter of the first paragraph gets a drop-cap   -->
+      <!-- automatically — no need to do anything special for that.  -->
+      <!-- ======================================================= -->
+      <p>I don’t find happiness in any of these
+Not because youve done something… even if you have, I won’t even blame your actions or decisions <br>
+I just don’t feel chosen cause whatever we have going on which I can’t define  feels like it’s one sided 
+Everything is about you and how I make you feel.<br>
+Calm no issue….. women are to be loved
+Due to this one sided situation; it’s like a constant effort on my side cause I want to show you how much at which I love you. <br>
+We are in a generation where love isn’t affirmation anymore but lies in action. <br>
+Speaking of action; am not one of those rich dudes of yours; maybe with daddy’s money… nope; am very broke.<br>
+Couldn’t even get you anything on your birthday which I really really feel sad about. These weeks have been hell for me. But anyway  <br>
+besides we are done with school, no one will struggle with attachment<br>
+Me?? Nothing has changed. Haven’t loved anyone as much as I do for you. The depth at which I loved you 3 years ago when you kissed my forehead, that’s exactly how it is now now. <br>
+So yeah, I’ll continue to be In hiatus working, planning and plotting which always makes my comeback powerful <br>
+Anyway byee
+      </p>
+
+      <div class="sign">
+        Please Respect my space...<br>
+        message will terminate 30 mins time
+      </div>
+    </div>
+
+    <div class="footer-note">made for one person only</div>
+  </section>
+
+<script>
+  (function(){
+    const field = document.getElementById('stars');
+    const n = 50;
+    for(let i=0;i<n;i++){
+      const s = document.createElement('div');
+      s.className = 'star';
+      const size = Math.random()*2 + 0.6;
+      s.style.width = size+'px';
+      s.style.height = size+'px';
+      s.style.left = Math.random()*100+'%';
+      s.style.top = Math.random()*100+'%';
+      s.style.animationDelay = (Math.random()*5)+'s';
+      field.appendChild(s);
+    }
+  })();
+
+  const drawPath = document.getElementById('drawPath');
+  const len = drawPath.getTotalLength();
+  drawPath.style.strokeDasharray = len;
+  drawPath.style.strokeDashoffset = len;
+  drawPath.getBoundingClientRect();
+  drawPath.style.transition = 'stroke-dashoffset 2200ms cubic-bezier(.4,0,.2,1) 700ms';
+  requestAnimationFrame(() => { drawPath.style.strokeDashoffset = 0; });
+
+  setTimeout(() => {
+    document.getElementById('pin').classList.add('show');
+  }, 2700);
+
+  const card = document.getElementById('letterCard');
+  const stage = document.querySelector('.letter-stage');
+  if (window.matchMedia('(hover: hover)').matches) {
+    stage.style.perspective = '1200px';
+    stage.addEventListener('mousemove', (e) => {
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      card.style.transform = `rotateX(${(-y*3).toFixed(2)}deg) rotateY(${(x*3).toFixed(2)}deg)`;
+    });
+    stage.addEventListener('mouseleave', () => { card.style.transform = 'rotateX(0) rotateY(0)'; });
+  }
+</script>
+
+</body>
+</html>

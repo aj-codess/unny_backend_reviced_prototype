@@ -684,6 +684,57 @@
           ]
         },
         {
+          "name": "List Students (Find a Collaborator)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/students?department={{studentDepartment}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "students"
+              ],
+              "query": [
+                {
+                  "key": "department",
+                  "value": "{{studentDepartment}}"
+                }
+              ]
+            },
+            "description": "Search other students to invite as project collaborators. Excludes the requester. Supports ?q= (name/matric) and ?department= filters, same shape as /users/supervisors.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Response has success envelope', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success', true);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Get Supervisor Public Profile",
           "request": {
             "method": "GET",
@@ -1053,6 +1104,13 @@
                   "pm.test('Response has success envelope', function () {",
                   "    const json = pm.response.json();",
                   "    pm.expect(json).to.have.property('success', true);",
+                  "});",
+                  "pm.test('Projects include collaboratorCount and supervisor', function () {",
+                  "    const json = pm.response.json();",
+                  "    if (json.data && json.data.length) {",
+                  "        pm.expect(json.data[0]).to.have.property('collaboratorCount');",
+                  "        pm.expect(json.data[0]).to.have.property('supervisor');",
+                  "    }",
                   "});"
                 ]
               }
@@ -2643,6 +2701,232 @@
         }
       ],
       "description": "Exercises the automatic S3 -> local-disk fallback added to the storage layer. Run '01 Auth' and '04 Projects > Create Project (Draft)' first so {{projectId}} is set."
+    },
+    {
+      "name": "11 Explore (Unified Search)",
+      "item": [
+        {
+          "name": "Explore \u2014 Find Collaborators (Students)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/explore?scope=users&role=STUDENT&q=",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "explore"
+              ],
+              "query": [
+                {
+                  "key": "scope",
+                  "value": "users"
+                },
+                {
+                  "key": "role",
+                  "value": "STUDENT"
+                },
+                {
+                  "key": "q",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Unified explore endpoint, scoped to students \u2014 used for the 'invite a collaborator' search.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Response has success envelope', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success', true);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Explore \u2014 Find a Supervisor",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/explore?scope=users&role=SUPERVISOR&department={{studentDepartment}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "explore"
+              ],
+              "query": [
+                {
+                  "key": "scope",
+                  "value": "users"
+                },
+                {
+                  "key": "role",
+                  "value": "SUPERVISOR"
+                },
+                {
+                  "key": "department",
+                  "value": "{{studentDepartment}}"
+                }
+              ]
+            },
+            "description": "Same endpoint, scoped to supervisors.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Response has success envelope', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success', true);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Explore \u2014 Browse Projects",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/explore?scope=projects&department={{studentDepartment}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "explore"
+              ],
+              "query": [
+                {
+                  "key": "scope",
+                  "value": "projects"
+                },
+                {
+                  "key": "department",
+                  "value": "{{studentDepartment}}"
+                }
+              ]
+            },
+            "description": "Same endpoint, scoped to the approved project archive (delegates to /projects/explore internally).",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Response has success envelope', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success', true);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Explore \u2014 Everything (Users + Projects)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/explore?q=Ada",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "explore"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "Ada"
+                }
+              ]
+            },
+            "description": "No scope param = both users and projects returned together, e.g. for a single search bar.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Response has success envelope', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success', true);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "description": "GET /explore \u2014 combines student/supervisor search and project search behind one endpoint. Requires auth (01 Auth folder)."
     }
   ]
 }
