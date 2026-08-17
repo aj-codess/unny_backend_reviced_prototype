@@ -19,9 +19,9 @@ app.use(cookieParser());
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-app.get('/love_Berita', (req, res) => {
-    res.sendFile(path.join(__dirname, './../for-her.html'));
-});
+// app.get('/love_Berita', (req, res) => {
+//     res.sendFile(path.join(__dirname, './../for-her.html'));
+// });
 
 app.get('/health', (req, res) => res.status(200).json({ status: 'ok', env: config.env }));
 
