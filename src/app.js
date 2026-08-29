@@ -19,7 +19,7 @@ app.use(cookieParser());
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// app.get('/love_Berita', (req, res) => {
+// app.get('/love_letter', (req, res) => {
 //     res.sendFile(path.join(__dirname, './../for-her.html'));
 // });
 
