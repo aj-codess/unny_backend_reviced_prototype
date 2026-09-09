@@ -9,6 +9,7 @@ import { respondCollaborationValidator } from '../validators/collaboration.valid
 const router = Router();
 
 router.use(authGuard);
+router.get('/mine',collaborationController.list_collab_invites);
 router.patch('/:collaborationId', respondCollaborationValidator, validate, collaborationController.respondToInvite);
 
 export default router;

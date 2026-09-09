@@ -31,6 +31,39 @@ export const inviteCollaborator = async (projectId, ownerId, invitedUserId) => {
   return collaboration;
 };
 
+
+/**
+ * Pending collaboration invites addressed to this user, across every
+ * project — their personal "invites inbox." Only status = INVITED rows
+ * are returned; an OWNER's own auto-accepted row (created at project
+ * creation) is naturally excluded since it's never INVITED.
+ */
+export const collaborationInvitesList = async (userId) => {
+  const invites = await prisma.projectCollaborator.findMany({
+    where: { userId, status: 'INVITED' },
+    orderBy: { invitedAt: 'desc' },
+    include: {
+      project: {
+        select: {
+          id: true,
+          title: true,
+          abstract: true,
+          department: true,
+          academicYear: true,
+          status: true,
+          submittedBy: {
+            select: { id: true, profile: { select: { fullName: true, avatarUrl: true } } },
+          },
+        },
+      },
+    },
+  });
+
+  return invites;
+};
+
+
+
 export const respondToInvite = async (collaborationId, userId, status) => {
   const collaboration = await prisma.projectCollaborator.findUnique({
     where: { id: collaborationId },

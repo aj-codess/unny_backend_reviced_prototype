@@ -2,6 +2,15 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { success } from '../utils/ApiResponse.js';
 import * as collaborationService from '../services/collaboration.service.js';
 
+
+export const list_collab_invites = asyncHandler(async (req, res) => {
+  const collaborationInvitesPayload = await collaborationService.collaborationInvitesList(
+    req.user.id
+  );
+  success(res,200,'Collaboration Invites List Fetched',collaborationInvitesPayload);
+});
+
+
 export const inviteCollaborator = asyncHandler(async (req, res) => {
   const collaboration = await collaborationService.inviteCollaborator(
     req.params.projectId,
@@ -10,6 +19,9 @@ export const inviteCollaborator = asyncHandler(async (req, res) => {
   );
   success(res, 201, 'Collaborator invited', collaboration);
 });
+
+
+
 
 export const respondToInvite = asyncHandler(async (req, res) => {
   const collaboration = await collaborationService.respondToInvite(
@@ -20,10 +32,15 @@ export const respondToInvite = asyncHandler(async (req, res) => {
   success(res, 200, 'Invitation response recorded', collaboration);
 });
 
+
+
+
 export const listCollaborators = asyncHandler(async (req, res) => {
   const collaborators = await collaborationService.listCollaborators(req.params.projectId);
   success(res, 200, 'Collaborators fetched', collaborators);
 });
+
+
 
 export const removeCollaborator = asyncHandler(async (req, res) => {
   await collaborationService.removeCollaborator(req.params.projectId, req.user.id, req.params.userId);
