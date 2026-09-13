@@ -1,38 +1,17 @@
 {
   "info": {
-    "_postman_id": "05c8be4b-2c82-4822-a45c-350caf3e0fd0",
+    "_postman_id": "f0fa9177-5fc3-49ae-a38b-a73fb5e1002e",
     "name": "Unny API",
-    "description": "Final year project archive & collaboration platform.\n\nRun folders top-to-bottom against the Unny Local environment: 01 Auth creates a student, a second collaborator student, and a supervisor and stores their tokens automatically. Later folders chain off the ids/tokens those requests save into the environment (projectId, tagId, collaborationId, supervisionRequestId, uploadKey, notificationId), so running requests out of order will fail until their dependencies have run once.\n\nTypical happy-path demo order:\n1. Auth: register student, collaborator, supervisor\n2. Tags: create a tag\n3. Projects: create draft project\n4. Uploads: presign project file (simulates attaching the report)\n5. Supervision: request supervision -> supervisor accepts\n6. Projects: submit project for review\n7. Reviews: supervisor approves\n8. Projects: explore -> the project now appears in the public archive\n\nv1.1 \u2014 added '10 Local Storage Fallback' folder covering the S3/local-disk auto-fallback upload path.",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    "description": "Final year project archive & collaboration platform.\n\nRun folders top-to-bottom against the Unny Local environment: 01 Auth creates a student, a second collaborator student, and a supervisor and stores their tokens automatically. Later folders chain off the ids/tokens those requests save into the environment (projectId, tagId, collaborationId, supervisionRequestId, uploadKey, notificationId), so running requests out of order will fail until their dependencies have run once.\n\nTypical happy-path demo order:\n1. Auth: register student, collaborator, supervisor\n2. Tags: create a tag\n3. Projects: create draft project\n4. Uploads: presign project file (simulates attaching the report)\n5. Supervision: request supervision -> supervisor accepts\n6. Projects: submit project for review\n7. Reviews: supervisor approves\n8. Projects: explore -> the project now appears in the public archive\n\nv1.1 — added '10 Local Storage Fallback' folder covering the S3/local-disk auto-fallback upload path.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "35355769"
   },
-  "auth": {
-    "type": "noauth"
-  },
-  "variable": [],
   "item": [
     {
       "name": "00 Health",
       "item": [
         {
           "name": "Health Check",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{serverUrl}}/health",
-              "host": [
-                "{{serverUrl}}"
-              ],
-              "path": [
-                "health"
-              ]
-            },
-            "description": "",
-            "auth": {
-              "type": "noauth"
-            }
-          },
-          "response": [],
           "event": [
             {
               "listen": "test",
@@ -46,49 +25,32 @@
                 ]
               }
             }
-          ]
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{serverUrl}}/health",
+              "host": [
+                "{{serverUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          },
+          "response": []
         }
-      ],
-      "description": ""
+      ]
     },
     {
       "name": "01 Auth",
       "item": [
         {
           "name": "Register Student",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/auth/register",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "auth",
-                "register"
-              ]
-            },
-            "description": "Creates the primary student account used through the rest of the collection.",
-            "auth": {
-              "type": "noauth"
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"{{studentEmail}}\",\n  \"password\": \"{{studentPassword}}\",\n  \"role\": \"STUDENT\",\n  \"fullName\": \"{{studentFullName}}\",\n  \"department\": \"{{studentDepartment}}\",\n  \"matricNumber\": \"{{studentMatric}}\",\n  \"level\": \"400L\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          },
-          "response": [],
           "event": [
             {
               "listen": "test",
@@ -114,11 +76,11 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Register Collaborator (Second Student)",
+          ],
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
             "header": [
               {
@@ -126,6 +88,15 @@
                 "value": "application/json"
               }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{studentEmail}}\",\n  \"password\": \"{{studentPassword}}\",\n  \"role\": \"STUDENT\",\n  \"fullName\": \"{{studentFullName}}\",\n  \"department\": \"{{studentDepartment}}\",\n  \"matricNumber\": \"{{studentMatric}}\",\n  \"level\": \"400L\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
               "raw": "{{baseUrl}}/auth/register",
               "host": [
@@ -136,21 +107,12 @@
                 "register"
               ]
             },
-            "description": "A second student account, used to exercise the project-collaboration invite flow.",
-            "auth": {
-              "type": "noauth"
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"{{collaboratorEmail}}\",\n  \"password\": \"{{collaboratorPassword}}\",\n  \"role\": \"STUDENT\",\n  \"fullName\": \"{{collaboratorFullName}}\",\n  \"department\": \"{{studentDepartment}}\",\n  \"matricNumber\": \"{{collaboratorMatric}}\",\n  \"level\": \"400L\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
+            "description": "Creates the primary student account used through the rest of the collection."
           },
-          "response": [],
+          "response": []
+        },
+        {
+          "name": "Register Collaborator (Second Student)",
           "event": [
             {
               "listen": "test",
@@ -176,11 +138,11 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Register Supervisor",
+          ],
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
             "header": [
               {
@@ -188,6 +150,15 @@
                 "value": "application/json"
               }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{collaboratorEmail}}\",\n  \"password\": \"{{collaboratorPassword}}\",\n  \"role\": \"STUDENT\",\n  \"fullName\": \"{{collaboratorFullName}}\",\n  \"department\": \"{{studentDepartment}}\",\n  \"matricNumber\": \"{{collaboratorMatric}}\",\n  \"level\": \"400L\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
               "raw": "{{baseUrl}}/auth/register",
               "host": [
@@ -198,21 +169,12 @@
                 "register"
               ]
             },
-            "description": "Creates the supervisor account used to review/approve/reject projects.",
-            "auth": {
-              "type": "noauth"
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"{{supervisorEmail}}\",\n  \"password\": \"{{supervisorPassword}}\",\n  \"role\": \"SUPERVISOR\",\n  \"fullName\": \"{{supervisorFullName}}\",\n  \"department\": \"{{studentDepartment}}\",\n  \"staffId\": \"{{supervisorStaffId}}\",\n  \"specialization\": \"Distributed Systems\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
+            "description": "A second student account, used to exercise the project-collaboration invite flow."
           },
-          "response": [],
+          "response": []
+        },
+        {
+          "name": "Register Supervisor",
           "event": [
             {
               "listen": "test",
@@ -238,11 +200,11 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Login Student",
+          ],
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
             "header": [
               {
@@ -250,31 +212,31 @@
                 "value": "application/json"
               }
             ],
-            "url": {
-              "raw": "{{baseUrl}}/auth/login",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "auth",
-                "login"
-              ]
-            },
-            "description": "Use if tokens expire mid-session; re-authenticates the student and refreshes stored tokens.",
-            "auth": {
-              "type": "noauth"
-            },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"{{studentEmail}}\",\n  \"password\": \"{{studentPassword}}\"\n}",
+              "raw": "{\n  \"email\": \"{{supervisorEmail}}\",\n  \"password\": \"{{supervisorPassword}}\",\n  \"role\": \"SUPERVISOR\",\n  \"fullName\": \"{{supervisorFullName}}\",\n  \"department\": \"{{studentDepartment}}\",\n  \"staffId\": \"{{supervisorStaffId}}\",\n  \"specialization\": \"Distributed Systems\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
-            }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Creates the supervisor account used to review/approve/reject projects."
           },
-          "response": [],
+          "response": []
+        },
+        {
+          "name": "Login Student",
           "event": [
             {
               "listen": "test",
@@ -300,11 +262,11 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Login Supervisor",
+          ],
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
             "header": [
               {
@@ -312,6 +274,15 @@
                 "value": "application/json"
               }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{studentEmail}}\",\n  \"password\": \"{{studentPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
               "raw": "{{baseUrl}}/auth/login",
               "host": [
@@ -322,21 +293,12 @@
                 "login"
               ]
             },
-            "description": "",
-            "auth": {
-              "type": "noauth"
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"{{supervisorEmail}}\",\n  \"password\": \"{{supervisorPassword}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
+            "description": "Use if tokens expire mid-session; re-authenticates the student and refreshes stored tokens."
           },
-          "response": [],
+          "response": []
+        },
+        {
+          "name": "Login Supervisor",
           "event": [
             {
               "listen": "test",
@@ -362,11 +324,11 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Refresh Token (Student)",
+          ],
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
             "header": [
               {
@@ -374,31 +336,30 @@
                 "value": "application/json"
               }
             ],
-            "url": {
-              "raw": "{{baseUrl}}/auth/refresh",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "auth",
-                "refresh"
-              ]
-            },
-            "description": "Rotates the student's refresh token \u2014 the old one is revoked server-side on use.",
-            "auth": {
-              "type": "noauth"
-            },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"refreshToken\": \"{{studentRefreshToken}}\"\n}",
+              "raw": "{\n  \"email\": \"{{supervisorEmail}}\",\n  \"password\": \"{{supervisorPassword}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
             }
           },
-          "response": [],
+          "response": []
+        },
+        {
+          "name": "Refresh Token (Student)",
           "event": [
             {
               "listen": "test",
@@ -417,11 +378,72 @@
                 ]
               }
             }
-          ]
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{studentRefreshToken}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh"
+              ]
+            },
+            "description": "Rotates the student's refresh token — the old one is revoked server-side on use."
+          },
+          "response": []
         },
         {
           "name": "Get Current User (Student)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response has success envelope', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success', true);",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -433,20 +455,68 @@
                 "auth",
                 "me"
               ]
-            },
-            "description": "",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{studentAccessToken}}",
-                  "type": "string"
-                }
-              ]
             }
           },
-          "response": [],
+          "response": []
+        },
+        {
+          "name": "Logout (Student)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{studentRefreshToken}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            },
+            "description": "Revokes the refresh token. Run this last if you want to prove tokens are actually invalidated."
+          },
+          "response": []
+        }
+      ],
+      "description": "Registration, login, token refresh/logout."
+    },
+    {
+      "name": "02 Users & Profiles",
+      "item": [
+        {
+          "name": "Get My Profile (Student)",
           "event": [
             {
               "listen": "test",
@@ -464,67 +534,18 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Logout (Student)",
+          ],
           "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/auth/logout",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "auth",
-                "logout"
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentAccessToken}}",
+                  "type": "string"
+                }
               ]
             },
-            "description": "Revokes the refresh token. Run this last if you want to prove tokens are actually invalidated.",
-            "auth": {
-              "type": "noauth"
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"refreshToken\": \"{{studentRefreshToken}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
-                ]
-              }
-            }
-          ]
-        }
-      ],
-      "description": "Registration, login, token refresh/logout."
-    },
-    {
-      "name": "02 Users & Profiles",
-      "item": [
-        {
-          "name": "Get My Profile (Student)",
-          "request": {
             "method": "GET",
             "header": [],
             "url": {
@@ -536,20 +557,12 @@
                 "users",
                 "me"
               ]
-            },
-            "description": "",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{studentAccessToken}}",
-                  "type": "string"
-                }
-              ]
             }
           },
-          "response": [],
+          "response": []
+        },
+        {
+          "name": "Update My Profile (Student)",
           "event": [
             {
               "listen": "test",
@@ -567,11 +580,18 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Update My Profile (Student)",
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "PATCH",
             "header": [
               {
@@ -579,6 +599,15 @@
                 "value": "application/json"
               }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bio\": \"Final year Computer Science student interested in distributed systems.\",\n  \"phone\": \"+2348012345678\",\n  \"level\": \"400L\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
               "raw": "{{baseUrl}}/users/me",
               "host": [
@@ -588,29 +617,12 @@
                 "users",
                 "me"
               ]
-            },
-            "description": "",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{studentAccessToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"bio\": \"Final year Computer Science student interested in distributed systems.\",\n  \"phone\": \"+2348012345678\",\n  \"level\": \"400L\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
             }
           },
-          "response": [],
+          "response": []
+        },
+        {
+          "name": "List Supervisors",
           "event": [
             {
               "listen": "test",
@@ -628,11 +640,18 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "List Supervisors",
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -651,7 +670,29 @@
                 }
               ]
             },
-            "description": "Students browse this list to find a supervisor to request.",
+            "description": "Students browse this list to find a supervisor to request."
+          },
+          "response": []
+        },
+        {
+          "name": "List Students (Find a Collaborator)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Response has success envelope', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success', true);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -661,31 +702,7 @@
                   "type": "string"
                 }
               ]
-            }
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "pm.test('Response has success envelope', function () {",
-                  "    const json = pm.response.json();",
-                  "    pm.expect(json).to.have.property('success', true);",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "List Students (Find a Collaborator)",
-          "request": {
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -704,64 +721,12 @@
                 }
               ]
             },
-            "description": "Search other students to invite as project collaborators. Excludes the requester. Supports ?q= (name/matric) and ?department= filters, same shape as /users/supervisors.",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{studentAccessToken}}",
-                  "type": "string"
-                }
-              ]
-            }
+            "description": "Search other students to invite as project collaborators. Excludes the requester. Supports ?q= (name/matric) and ?department= filters, same shape as /users/supervisors."
           },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
-                  "pm.test('Response has success envelope', function () {",
-                  "    const json = pm.response.json();",
-                  "    pm.expect(json).to.have.property('success', true);",
-                  "});"
-                ]
-              }
-            }
-          ]
+          "response": []
         },
         {
           "name": "Get Supervisor Public Profile",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/users/{{supervisorId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "users",
-                "{{supervisorId}}"
-              ]
-            },
-            "description": "",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{studentAccessToken}}",
-                  "type": "string"
-                }
-              ]
-            }
-          },
-          "response": [],
           "event": [
             {
               "listen": "test",
@@ -775,34 +740,40 @@
                 ]
               }
             }
-          ]
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{supervisorId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{supervisorId}}"
+              ]
+            }
+          },
+          "response": []
         }
-      ],
-      "description": ""
+      ]
     },
     {
       "name": "03 Tags",
       "item": [
         {
           "name": "List Tags",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/tags",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "tags"
-              ]
-            },
-            "description": "",
-            "auth": {
-              "type": "noauth"
-            }
-          },
-          "response": [],
           "event": [
             {
               "listen": "test",
@@ -820,18 +791,13 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Create Tag",
+          ],
           "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/tags",
               "host": [
@@ -840,29 +806,12 @@
               "path": [
                 "tags"
               ]
-            },
-            "description": "",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{studentAccessToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"React Native\",\n  \"category\": \"FRAMEWORK\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
             }
           },
-          "response": [],
+          "response": []
+        },
+        {
+          "name": "Create Tag",
           "event": [
             {
               "listen": "test",
@@ -880,34 +829,8 @@
                 ]
               }
             }
-          ]
-        }
-      ],
-      "description": ""
-    },
-    {
-      "name": "04 Projects",
-      "item": [
-        {
-          "name": "Create Project (Draft)",
+          ],
           "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/projects",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "projects"
-              ]
-            },
-            "description": "",
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -918,17 +841,41 @@
                 }
               ]
             },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Unny \\u2014 A Mobile Archive for Final Year Projects\",\n  \"abstract\": \"A mobile platform that lets students archive, discover and collaborate on final year projects, with a structured supervisor review workflow.\",\n  \"academicYear\": \"{{academicYear}}\",\n  \"department\": \"{{studentDepartment}}\",\n  \"repoUrl\": \"https://github.com/example/unny\",\n  \"tagIds\": [\n    \"{{tagId}}\"\n  ]\n}",
+              "raw": "{\n  \"name\": \"React Native\",\n  \"category\": \"FRAMEWORK\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tags",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tags"
+              ]
             }
           },
-          "response": [],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "04 Projects",
+      "item": [
+        {
+          "name": "Create Project (Draft)",
           "event": [
             {
               "listen": "test",
@@ -946,11 +893,77 @@
                 ]
               }
             }
-          ]
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Unny \\u2014 A Mobile Archive for Final Year Projects\",\n  \"abstract\": \"A mobile platform that lets students archive, discover and collaborate on final year projects, with a structured supervisor review workflow.\",\n  \"academicYear\": \"{{academicYear}}\",\n  \"department\": \"{{studentDepartment}}\",\n  \"repoUrl\": \"https://github.com/example/unny\",\n  \"tagIds\": [\n    \"{{tagId}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Get Project By Id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response has success envelope', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success', true);",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -962,20 +975,12 @@
                 "projects",
                 "{{projectId}}"
               ]
-            },
-            "description": "",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{studentAccessToken}}",
-                  "type": "string"
-                }
-              ]
             }
           },
-          "response": [],
+          "response": []
+        },
+        {
+          "name": "Update Project",
           "event": [
             {
               "listen": "test",
@@ -993,11 +998,18 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Update Project",
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "PATCH",
             "header": [
               {
@@ -1005,6 +1017,15 @@
                 "value": "application/json"
               }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"abstract\": \"Updated abstract: a mobile-first archive and moderation workflow for final year projects across departments.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
               "raw": "{{baseUrl}}/projects/{{projectId}}",
               "host": [
@@ -1014,29 +1035,12 @@
                 "projects",
                 "{{projectId}}"
               ]
-            },
-            "description": "",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{studentAccessToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"abstract\": \"Updated abstract: a mobile-first archive and moderation workflow for final year projects across departments.\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
             }
           },
-          "response": [],
+          "response": []
+        },
+        {
+          "name": "Explore Projects (Public Archive)",
           "event": [
             {
               "listen": "test",
@@ -1050,15 +1054,22 @@
                   "pm.test('Response has success envelope', function () {",
                   "    const json = pm.response.json();",
                   "    pm.expect(json).to.have.property('success', true);",
+                  "});",
+                  "pm.test('Projects include collaboratorCount and supervisor', function () {",
+                  "    const json = pm.response.json();",
+                  "    if (json.data && json.data.length) {",
+                  "        pm.expect(json.data[0]).to.have.property('collaboratorCount');",
+                  "        pm.expect(json.data[0]).to.have.property('supervisor');",
+                  "    }",
                   "});"
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Explore Projects (Public Archive)",
+          ],
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -1085,12 +1096,12 @@
                 }
               ]
             },
-            "description": "No auth required \u2014 only APPROVED projects are returned.",
-            "auth": {
-              "type": "noauth"
-            }
+            "description": "No auth required — only APPROVED projects are returned."
           },
-          "response": [],
+          "response": []
+        },
+        {
+          "name": "My Projects (Student)",
           "event": [
             {
               "listen": "test",
@@ -1104,22 +1115,22 @@
                   "pm.test('Response has success envelope', function () {",
                   "    const json = pm.response.json();",
                   "    pm.expect(json).to.have.property('success', true);",
-                  "});",
-                  "pm.test('Projects include collaboratorCount and supervisor', function () {",
-                  "    const json = pm.response.json();",
-                  "    if (json.data && json.data.length) {",
-                  "        pm.expect(json.data[0]).to.have.property('collaboratorCount');",
-                  "        pm.expect(json.data[0]).to.have.property('supervisor');",
-                  "    }",
                   "});"
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "My Projects (Student)",
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -1131,20 +1142,12 @@
                 "projects",
                 "mine"
               ]
-            },
-            "description": "",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{studentAccessToken}}",
-                  "type": "string"
-                }
-              ]
             }
           },
-          "response": [],
+          "response": []
+        },
+        {
+          "name": "My Review Queue (Supervisor)",
           "event": [
             {
               "listen": "test",
@@ -1162,11 +1165,18 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "My Review Queue (Supervisor)",
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{supervisorAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -1178,82 +1188,12 @@
                 "projects",
                 "review-queue"
               ]
-            },
-            "description": "",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{supervisorAccessToken}}",
-                  "type": "string"
-                }
-              ]
             }
           },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "pm.test('Response has success envelope', function () {",
-                  "    const json = pm.response.json();",
-                  "    pm.expect(json).to.have.property('success', true);",
-                  "});"
-                ]
-              }
-            }
-          ]
+          "response": []
         },
         {
           "name": "Add Comment On Project",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/projects/{{projectId}}/comments",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "projects",
-                "{{projectId}}",
-                "comments"
-              ]
-            },
-            "description": "",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{supervisorAccessToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"body\": \"Looks promising \\u2014 make sure chapter 3 covers your data model in more depth.\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          },
-          "response": [],
           "event": [
             {
               "listen": "test",
@@ -1271,11 +1211,79 @@
                 ]
               }
             }
-          ]
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{supervisorAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"body\": \"Looks promising \\u2014 make sure chapter 3 covers your data model in more depth.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}/comments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "{{projectId}}",
+                "comments"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Toggle Bookmark",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response has success envelope', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success', true);",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{collaboratorAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
             "header": [],
             "url": {
@@ -1288,20 +1296,12 @@
                 "{{projectId}}",
                 "bookmark"
               ]
-            },
-            "description": "",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{collaboratorAccessToken}}",
-                  "type": "string"
-                }
-              ]
             }
           },
-          "response": [],
+          "response": []
+        },
+        {
+          "name": "My Bookmarks",
           "event": [
             {
               "listen": "test",
@@ -1319,11 +1319,18 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "My Bookmarks",
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{collaboratorAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -1335,20 +1342,12 @@
                 "projects",
                 "bookmarks"
               ]
-            },
-            "description": "",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{collaboratorAccessToken}}",
-                  "type": "string"
-                }
-              ]
             }
           },
-          "response": [],
+          "response": []
+        },
+        {
+          "name": "Submit Project For Review",
           "event": [
             {
               "listen": "test",
@@ -1366,11 +1365,18 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Submit Project For Review",
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
             "header": [],
             "url": {
@@ -1384,19 +1390,12 @@
                 "submit"
               ]
             },
-            "description": "Run this only after: (1) a supervisor has ACCEPTED a supervision request for this project, and (2) a report file has been attached via the Uploads folder.",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{studentAccessToken}}",
-                  "type": "string"
-                }
-              ]
-            }
+            "description": "Run this only after: (1) a supervisor has ACCEPTED a supervision request for this project, and (2) a report file has been attached via the Uploads folder."
           },
-          "response": [],
+          "response": []
+        },
+        {
+          "name": "Delete Project (Draft Only)",
           "event": [
             {
               "listen": "test",
@@ -1406,19 +1405,22 @@
                 "exec": [
                   "pm.test('Status code is 200', function () {",
                   "    pm.response.to.have.status(200);",
-                  "});",
-                  "pm.test('Response has success envelope', function () {",
-                  "    const json = pm.response.json();",
-                  "    pm.expect(json).to.have.property('success', true);",
                   "});"
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Delete Project (Draft Only)",
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "DELETE",
             "header": [],
             "url": {
@@ -1431,82 +1433,17 @@
                 "{{projectId}}"
               ]
             },
-            "description": "Only works while the project is still DRAFT \u2014 disabled once submitted.",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{studentAccessToken}}",
-                  "type": "string"
-                }
-              ]
-            }
+            "description": "Only works while the project is still DRAFT — disabled once submitted."
           },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
-                ]
-              }
-            }
-          ]
+          "response": []
         }
-      ],
-      "description": ""
+      ]
     },
     {
       "name": "05 Uploads (S3 presigned URLs)",
       "item": [
         {
           "name": "Presign Project File Upload",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/uploads/project-file",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "uploads",
-                "project-file"
-              ]
-            },
-            "description": "Returns a presigned S3 PUT URL. Upload the PDF with a separate PUT request directly to `uploadUrl` (outside this API) before calling Submit Project For Review.",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{studentAccessToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"fileName\": \"final-year-report.pdf\",\n  \"contentType\": \"application/pdf\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          },
-          "response": [],
           "event": [
             {
               "listen": "test",
@@ -1525,29 +1462,8 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Presign Avatar Upload",
+          ],
           "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/uploads/avatar",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "uploads",
-                "avatar"
-              ]
-            },
-            "description": "",
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -1558,17 +1474,38 @@
                 }
               ]
             },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fileName\": \"avatar.png\",\n  \"contentType\": \"image/png\"\n}",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"fileName\": \"final-year-report.pdf\",\n  \"contentType\": \"application/pdf\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
-            }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/uploads/project-file",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "uploads",
+                "project-file"
+              ]
+            },
+            "description": "Returns a presigned S3 PUT URL. Upload the PDF with a separate PUT request directly to `uploadUrl` (outside this API) before calling Submit Project For Review."
           },
-          "response": [],
+          "response": []
+        },
+        {
+          "name": "Presign Avatar Upload",
           "event": [
             {
               "listen": "test",
@@ -1586,36 +1523,8 @@
                 ]
               }
             }
-          ]
-        }
-      ],
-      "description": ""
-    },
-    {
-      "name": "06 Collaboration",
-      "item": [
-        {
-          "name": "Invite Collaborator",
+          ],
           "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/projects/{{projectId}}/collaborators",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "projects",
-                "{{projectId}}",
-                "collaborators"
-              ]
-            },
-            "description": "",
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -1626,17 +1535,42 @@
                 }
               ]
             },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"userId\": \"{{collaboratorId}}\"\n}",
+              "raw": "{\n  \"fileName\": \"avatar.png\",\n  \"contentType\": \"image/png\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/uploads/avatar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "uploads",
+                "avatar"
+              ]
             }
           },
-          "response": [],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "06 Collaboration",
+      "item": [
+        {
+          "name": "Invite Collaborator",
           "event": [
             {
               "listen": "test",
@@ -1654,11 +1588,79 @@
                 ]
               }
             }
-          ]
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{collaboratorId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}/collaborators",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "{{projectId}}",
+                "collaborators"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "List Collaborators",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response has success envelope', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success', true);",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -1671,20 +1673,12 @@
                 "{{projectId}}",
                 "collaborators"
               ]
-            },
-            "description": "",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{studentAccessToken}}",
-                  "type": "string"
-                }
-              ]
             }
           },
-          "response": [],
+          "response": []
+        },
+        {
+          "name": "Respond To Collaboration Invite (Accept)",
           "event": [
             {
               "listen": "test",
@@ -1702,29 +1696,8 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Respond To Collaboration Invite (Accept)",
+          ],
           "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/collaboration-invites/{{collaborationId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "collaboration-invites",
-                "{{collaborationId}}"
-              ]
-            },
-            "description": "Called by the invited student, not the project owner.",
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -1735,6 +1708,13 @@
                 }
               ]
             },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"status\": \"ACCEPTED\"\n}",
@@ -1743,9 +1723,23 @@
                   "language": "json"
                 }
               }
-            }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/collaboration-invites/{{collaborationId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "collaboration-invites",
+                "{{collaborationId}}"
+              ]
+            },
+            "description": "Called by the invited student, not the project owner."
           },
-          "response": [],
+          "response": []
+        },
+        {
+          "name": "Remove Collaborator",
           "event": [
             {
               "listen": "test",
@@ -1755,19 +1749,22 @@
                 "exec": [
                   "pm.test('Status code is 200', function () {",
                   "    pm.response.to.have.status(200);",
-                  "});",
-                  "pm.test('Response has success envelope', function () {",
-                  "    const json = pm.response.json();",
-                  "    pm.expect(json).to.have.property('success', true);",
                   "});"
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Remove Collaborator",
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "DELETE",
             "header": [],
             "url": {
@@ -1781,84 +1778,45 @@
                 "collaborators",
                 "{{collaboratorId}}"
               ]
-            },
-            "description": "",
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "list invites",
+          "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{studentAccessToken}}",
+                  "value": "{{access_token}}",
                   "type": "string"
                 }
               ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/collaboration-invites/mine",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "collaboration-invites",
+                "mine"
+              ]
             }
           },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
-                ]
-              }
-            }
-          ]
+          "response": []
         }
-      ],
-      "description": ""
+      ]
     },
     {
       "name": "07 Supervision Requests",
       "item": [
         {
           "name": "Request Supervision",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/projects/{{projectId}}/supervision-requests",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "projects",
-                "{{projectId}}",
-                "supervision-requests"
-              ]
-            },
-            "description": "",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{studentAccessToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"supervisorId\": \"{{supervisorId}}\",\n  \"message\": \"Would you be willing to supervise this project?\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          },
-          "response": [],
           "event": [
             {
               "listen": "test",
@@ -1876,24 +1834,8 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "List My Supervision Requests (Student)",
+          ],
           "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/supervision-requests/mine",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "supervision-requests",
-                "mine"
-              ]
-            },
-            "description": "",
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -1903,9 +1845,39 @@
                   "type": "string"
                 }
               ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"supervisorId\": \"{{supervisorId}}\",\n  \"message\": \"Would you be willing to supervise this project?\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}/supervision-requests",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "{{projectId}}",
+                "supervision-requests"
+              ]
             }
           },
-          "response": [],
+          "response": []
+        },
+        {
+          "name": "List My Supervision Requests (Student)",
           "event": [
             {
               "listen": "test",
@@ -1923,11 +1895,18 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "List My Supervision Requests (Supervisor)",
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -1939,20 +1918,12 @@
                 "supervision-requests",
                 "mine"
               ]
-            },
-            "description": "",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{supervisorAccessToken}}",
-                  "type": "string"
-                }
-              ]
             }
           },
-          "response": [],
+          "response": []
+        },
+        {
+          "name": "List My Supervision Requests (Supervisor)",
           "event": [
             {
               "listen": "test",
@@ -1970,11 +1941,64 @@
                 ]
               }
             }
-          ]
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{supervisorAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/supervision-requests/mine",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "supervision-requests",
+                "mine"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Respond To Supervision Request (Accept)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response has success envelope', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success', true);",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{supervisorAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "PATCH",
             "header": [
               {
@@ -1982,6 +2006,15 @@
                 "value": "application/json"
               }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ACCEPTED\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
               "raw": "{{baseUrl}}/supervision-requests/{{supervisionRequestId}}",
               "host": [
@@ -1992,28 +2025,17 @@
                 "{{supervisionRequestId}}"
               ]
             },
-            "description": "Accepting sets this supervisor as the project's assigned supervisor, unlocking submission.",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{supervisorAccessToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"status\": \"ACCEPTED\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
+            "description": "Accepting sets this supervisor as the project's assigned supervisor, unlocking submission."
           },
-          "response": [],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "08 Reviews (Approve / Reject / Comment)",
+      "item": [
+        {
+          "name": "Submit Review — Comment Only",
           "event": [
             {
               "listen": "test",
@@ -2021,8 +2043,8 @@
                 "type": "text/javascript",
                 "packages": {},
                 "exec": [
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
                   "});",
                   "pm.test('Response has success envelope', function () {",
                   "    const json = pm.response.json();",
@@ -2031,36 +2053,8 @@
                 ]
               }
             }
-          ]
-        }
-      ],
-      "description": ""
-    },
-    {
-      "name": "08 Reviews (Approve / Reject / Comment)",
-      "item": [
-        {
-          "name": "Submit Review \u2014 Comment Only",
+          ],
           "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/projects/{{projectId}}/reviews",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "projects",
-                "{{projectId}}",
-                "reviews"
-              ]
-            },
-            "description": "",
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -2071,6 +2065,13 @@
                 }
               ]
             },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"action\": \"COMMENTED\",\n  \"comment\": \"Please expand on your evaluation methodology before final submission.\"\n}",
@@ -2079,9 +2080,23 @@
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}/reviews",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "{{projectId}}",
+                "reviews"
+              ]
             }
           },
-          "response": [],
+          "response": []
+        },
+        {
+          "name": "Submit Review — Approve",
           "event": [
             {
               "listen": "test",
@@ -2099,30 +2114,8 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Submit Review \u2014 Approve",
+          ],
           "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/projects/{{projectId}}/reviews",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "projects",
-                "{{projectId}}",
-                "reviews"
-              ]
-            },
-            "description": "Requires the project to be PENDING_REVIEW (i.e. already submitted). On approval, a .docx certificate is generated and the project becomes publicly discoverable via Explore.",
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -2133,6 +2126,13 @@
                 }
               ]
             },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"action\": \"APPROVED\",\n  \"comment\": \"Well done \\u2014 approved for the archive.\"\n}",
@@ -2141,9 +2141,24 @@
                   "language": "json"
                 }
               }
-            }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}/reviews",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "{{projectId}}",
+                "reviews"
+              ]
+            },
+            "description": "Requires the project to be PENDING_REVIEW (i.e. already submitted). On approval, a .docx certificate is generated and the project becomes publicly discoverable via Explore."
           },
-          "response": [],
+          "response": []
+        },
+        {
+          "name": "Submit Review — Reject",
           "event": [
             {
               "listen": "test",
@@ -2161,30 +2176,8 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Submit Review \u2014 Reject",
+          ],
           "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/projects/{{projectId}}/reviews",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "projects",
-                "{{projectId}}",
-                "reviews"
-              ]
-            },
-            "description": "Alternative to Approve \u2014 run one or the other, not both, against the same PENDING_REVIEW project.",
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -2195,6 +2188,13 @@
                 }
               ]
             },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"action\": \"REJECTED\",\n  \"comment\": \"Please revise chapter 4 and resubmit.\"\n}",
@@ -2203,33 +2203,7 @@
                   "language": "json"
                 }
               }
-            }
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "pm.test('Status code is 201', function () {",
-                  "    pm.response.to.have.status(201);",
-                  "});",
-                  "pm.test('Response has success envelope', function () {",
-                  "    const json = pm.response.json();",
-                  "    pm.expect(json).to.have.property('success', true);",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "List Project Reviews",
-          "request": {
-            "method": "GET",
-            "header": [],
+            },
             "url": {
               "raw": "{{baseUrl}}/projects/{{projectId}}/reviews",
               "host": [
@@ -2241,19 +2215,12 @@
                 "reviews"
               ]
             },
-            "description": "",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{studentAccessToken}}",
-                  "type": "string"
-                }
-              ]
-            }
+            "description": "Alternative to Approve — run one or the other, not both, against the same PENDING_REVIEW project."
           },
-          "response": [],
+          "response": []
+        },
+        {
+          "name": "List Project Reviews",
           "event": [
             {
               "listen": "test",
@@ -2271,29 +2238,8 @@
                 ]
               }
             }
-          ]
-        }
-      ],
-      "description": ""
-    },
-    {
-      "name": "09 Notifications",
-      "item": [
-        {
-          "name": "List My Notifications",
+          ],
           "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/notifications",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "notifications"
-              ]
-            },
-            "description": "",
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -2303,9 +2249,30 @@
                   "type": "string"
                 }
               ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}/reviews",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "{{projectId}}",
+                "reviews"
+              ]
             }
           },
-          "response": [],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "09 Notifications",
+      "item": [
+        {
+          "name": "List My Notifications",
           "event": [
             {
               "listen": "test",
@@ -2327,11 +2294,59 @@
                 ]
               }
             }
-          ]
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notifications"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Mark Notification As Read",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "PATCH",
             "header": [],
             "url": {
@@ -2344,20 +2359,12 @@
                 "{{notificationId}}",
                 "read"
               ]
-            },
-            "description": "",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{studentAccessToken}}",
-                  "type": "string"
-                }
-              ]
             }
           },
-          "response": [],
+          "response": []
+        },
+        {
+          "name": "Mark All Notifications As Read",
           "event": [
             {
               "listen": "test",
@@ -2371,11 +2378,18 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Mark All Notifications As Read",
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "PATCH",
             "header": [],
             "url": {
@@ -2387,77 +2401,12 @@
                 "notifications",
                 "read-all"
               ]
-            },
-            "description": "",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{studentAccessToken}}",
-                  "type": "string"
-                }
-              ]
             }
           },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "exec": [
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
-                ]
-              }
-            }
-          ]
+          "response": []
         },
         {
           "name": "Register Device Token (Push)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/notifications/devices",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "notifications",
-                "devices"
-              ]
-            },
-            "description": "",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{studentAccessToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"token\": \"sample-fcm-device-token\",\n  \"platform\": \"ANDROID\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          },
-          "response": [],
           "event": [
             {
               "listen": "test",
@@ -2471,29 +2420,8 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Unregister Device Token",
+          ],
           "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/notifications/devices",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "notifications",
-                "devices"
-              ]
-            },
-            "description": "",
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -2504,17 +2432,37 @@
                 }
               ]
             },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"token\": \"sample-fcm-device-token\"\n}",
+              "raw": "{\n  \"token\": \"sample-fcm-device-token\",\n  \"platform\": \"ANDROID\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications/devices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notifications",
+                "devices"
+              ]
             }
           },
-          "response": [],
+          "response": []
+        },
+        {
+          "name": "Unregister Device Token",
           "event": [
             {
               "listen": "test",
@@ -2528,35 +2476,8 @@
                 ]
               }
             }
-          ]
-        }
-      ],
-      "description": ""
-    },
-    {
-      "name": "10 Local Storage Fallback",
-      "item": [
-        {
-          "name": "Presign Project File Upload (S3 or Local \u2014 auto)",
+          ],
           "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/uploads/project-file",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "uploads",
-                "project-file"
-              ]
-            },
-            "description": "Same endpoint as the one in the '05 Uploads' folder \u2014 duplicated here so this folder can be run standalone. The backend decides S3 vs. local automatically based on whether AWS_S3_BUCKET/credentials are set (src/services/storage.service.js). This request detects which one you got back and stores it in {{storageBackend}}.",
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -2567,17 +2488,42 @@
                 }
               ]
             },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"fileName\": \"final-year-report.pdf\",\n  \"contentType\": \"application/pdf\"\n}",
+              "raw": "{\n  \"token\": \"sample-fcm-device-token\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications/devices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notifications",
+                "devices"
+              ]
             }
           },
-          "response": [],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "10 Local Storage Fallback",
+      "item": [
+        {
+          "name": "Presign Project File Upload (S3 or Local — auto)",
           "event": [
             {
               "listen": "test",
@@ -2599,37 +2545,50 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Upload File To Storage (S3 or Local)",
+          ],
           "request": {
-            "method": "PUT",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
             "header": [
               {
                 "key": "Content-Type",
-                "value": "application/pdf"
+                "value": "application/json"
               }
             ],
-            "url": {
-              "raw": "{{uploadUrl}}",
-              "host": [
-                "{{uploadUrl}}"
-              ],
-              "path": []
-            },
-            "description": "PUTs the raw file body directly to the presigned/signed URL captured by the previous request \u2014 no Bearer token needed, exactly like an S3 presigned PUT (the URL itself is the credential). Works unchanged whether {{uploadUrl}} points at S3 or at this server's own /local-storage route.\n\nMANUAL STEP: in the Body tab, click 'Select File' and choose a real PDF before sending \u2014 Postman cannot attach a file to a raw PUT body from a collection JSON file automatically.\n\nIf {{storageBackend}} is 'local', the file is written under LOCAL_STORAGE_DIR on the server (default storage/uploads) with a signature + expiry check enforced by src/routes/local-storage.routes.js.",
-            "auth": {
-              "type": "noauth"
-            },
             "body": {
-              "mode": "file",
-              "file": {
-                "src": null
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"fileName\": \"final-year-report.pdf\",\n  \"contentType\": \"application/pdf\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
               }
-            }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/uploads/project-file",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "uploads",
+                "project-file"
+              ]
+            },
+            "description": "Same endpoint as the one in the '05 Uploads' folder — duplicated here so this folder can be run standalone. The backend decides S3 vs. local automatically based on whether AWS_S3_BUCKET/credentials are set (src/services/storage.service.js). This request detects which one you got back and stores it in {{storageBackend}}."
           },
-          "response": [],
+          "response": []
+        },
+        {
+          "name": "Upload File To Storage (S3 or Local)",
           "event": [
             {
               "listen": "test",
@@ -2646,36 +2605,37 @@
                 ]
               }
             }
-          ]
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/pdf"
+              }
+            ],
+            "body": {
+              "mode": "file",
+              "file": {}
+            },
+            "url": {
+              "raw": "{{uploadUrl}}/",
+              "host": [
+                "{{uploadUrl}}"
+              ],
+              "path": [
+                ""
+              ]
+            },
+            "description": "PUTs the raw file body directly to the presigned/signed URL captured by the previous request — no Bearer token needed, exactly like an S3 presigned PUT (the URL itself is the credential). Works unchanged whether {{uploadUrl}} points at S3 or at this server's own /local-storage route.\n\nMANUAL STEP: in the Body tab, click 'Select File' and choose a real PDF before sending — Postman cannot attach a file to a raw PUT body from a collection JSON file automatically.\n\nIf {{storageBackend}} is 'local', the file is written under LOCAL_STORAGE_DIR on the server (default storage/uploads) with a signature + expiry check enforced by src/routes/local-storage.routes.js."
+          },
+          "response": []
         },
         {
           "name": "Get Project (Confirm File Attached)",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/projects/{{projectId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "projects",
-                "{{projectId}}"
-              ]
-            },
-            "description": "Reuses the standard project-detail endpoint to confirm fileKey/fileUrl were recorded regardless of which storage backend handled the upload.",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{studentAccessToken}}",
-                  "type": "string"
-                }
-              ]
-            }
-          },
-          "response": [],
           "event": [
             {
               "listen": "test",
@@ -2697,7 +2657,33 @@
                 ]
               }
             }
-          ]
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "{{projectId}}"
+              ]
+            },
+            "description": "Reuses the standard project-detail endpoint to confirm fileKey/fileUrl were recorded regardless of which storage backend handled the upload."
+          },
+          "response": []
         }
       ],
       "description": "Exercises the automatic S3 -> local-disk fallback added to the storage layer. Run '01 Auth' and '04 Projects > Create Project (Draft)' first so {{projectId}} is set."
@@ -2706,8 +2692,34 @@
       "name": "11 Explore (Unified Search)",
       "item": [
         {
-          "name": "Explore \u2014 Find Collaborators (Students)",
+          "name": "Explore — Find Collaborators (Students)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Response has success envelope', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('success', true);",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -2733,19 +2745,12 @@
                 }
               ]
             },
-            "description": "Unified explore endpoint, scoped to students \u2014 used for the 'invite a collaborator' search.",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{studentAccessToken}}",
-                  "type": "string"
-                }
-              ]
-            }
+            "description": "Unified explore endpoint, scoped to students — used for the 'invite a collaborator' search."
           },
-          "response": [],
+          "response": []
+        },
+        {
+          "name": "Explore — Find a Supervisor",
           "event": [
             {
               "listen": "test",
@@ -2761,11 +2766,18 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Explore \u2014 Find a Supervisor",
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -2791,19 +2803,12 @@
                 }
               ]
             },
-            "description": "Same endpoint, scoped to supervisors.",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{studentAccessToken}}",
-                  "type": "string"
-                }
-              ]
-            }
+            "description": "Same endpoint, scoped to supervisors."
           },
-          "response": [],
+          "response": []
+        },
+        {
+          "name": "Explore — Browse Projects",
           "event": [
             {
               "listen": "test",
@@ -2819,11 +2824,18 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Explore \u2014 Browse Projects",
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -2845,19 +2857,12 @@
                 }
               ]
             },
-            "description": "Same endpoint, scoped to the approved project archive (delegates to /projects/explore internally).",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{studentAccessToken}}",
-                  "type": "string"
-                }
-              ]
-            }
+            "description": "Same endpoint, scoped to the approved project archive (delegates to /projects/explore internally)."
           },
-          "response": [],
+          "response": []
+        },
+        {
+          "name": "Explore — Everything (Users + Projects)",
           "event": [
             {
               "listen": "test",
@@ -2873,11 +2878,18 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Explore \u2014 Everything (Users + Projects)",
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -2895,19 +2907,72 @@
                 }
               ]
             },
-            "description": "No scope param = both users and projects returned together, e.g. for a single search bar.",
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{studentAccessToken}}",
-                  "type": "string"
-                }
-              ]
-            }
+            "description": "No scope param = both users and projects returned together, e.g. for a single search bar."
           },
-          "response": [],
+          "response": []
+        }
+      ],
+      "description": "GET /explore — combines student/supervisor search and project search behind one endpoint. Requires auth (01 Auth folder)."
+    },
+    {
+      "name": "12 Admin",
+      "item": [
+        {
+          "name": "Login Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "if (json.success && json.data) {",
+                  "    pm.environment.set('adminAccessToken', json.data.accessToken);",
+                  "    pm.environment.set('adminRefreshToken', json.data.refreshToken);",
+                  "    pm.environment.set('adminId', json.data.user.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Logs in the admin account created via `npm run seed` (ADMIN_EMAIL/ADMIN_PASSWORD in .env). This account cannot be created through /auth/register."
+          },
+          "response": []
+        },
+        {
+          "name": "List Users — Pending Verification",
           "event": [
             {
               "listen": "test",
@@ -2923,10 +2988,178 @@
                 ]
               }
             }
-          ]
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users?verified=false",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "verified",
+                  "value": "false"
+                }
+              ]
+            },
+            "description": "Admin-only. Add &role=STUDENT or &role=SUPERVISOR to narrow further."
+          },
+          "response": []
+        },
+        {
+          "name": "Verify User (Student)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('User is now verified', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.data.isVerified).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{studentId}}/verify",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{studentId}}",
+                "verify"
+              ]
+            },
+            "description": "Verifies the student account registered in 01 Auth. Triggers an ACCOUNT_VERIFIED notification to that student."
+          },
+          "response": []
+        },
+        {
+          "name": "Verify User (Supervisor)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{supervisorId}}/verify",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{supervisorId}}",
+                "verify"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deactivate User (Collaborator)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('User is now inactive', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.data.isActive).to.eql(false);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{collaboratorId}}/deactivate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{collaboratorId}}",
+                "deactivate"
+              ]
+            },
+            "description": "Targets the second student account so it doesn't break the main demo flow. A deactivated user can no longer log in (authGuard/loginUser both check isActive)."
+          },
+          "response": []
         }
       ],
-      "description": "GET /explore \u2014 combines student/supervisor search and project search behind one endpoint. Requires auth (01 Auth folder)."
+      "description": "Requires an admin account to already exist — run `npm run seed` with ADMIN_EMAIL/ADMIN_PASSWORD set first. Run 01 Auth before this folder so {{studentId}}/{{supervisorId}}/{{collaboratorId}} are populated."
     }
   ]
 }
