@@ -55,7 +55,7 @@ export const loginUser = async (email, password, meta) => {
   if (!user || !user.isActive) throw new ApiError(401, 'Invalid credentials');
 
   const isMatch = await bcrypt.compare(password, user.passwordHash);
-  if (!isMatch) throw new ApiError(401, 'Invalid credentials');
+  if (!isMatch) throw new ApiError(401, 'Invalid credentials [password]');
 
   const tokens = await issueTokenPair(user, meta);
   return { user: omitPassword(user), ...tokens };
