@@ -8,6 +8,7 @@ import tagRoutes from './tag.routes.js';
 import notificationRoutes from './notification.routes.js';
 import uploadRoutes from './upload.routes.js';
 import exploreRoutes from './explore.routes.js';
+import adminRoutes from './admin.routes.js';
 
 const router = Router();
 
@@ -20,5 +21,6 @@ router.use('/tags', tagRoutes);
 router.use('/notifications', notificationRoutes);
 router.use('/uploads', uploadRoutes);
 router.use('/explore', exploreRoutes);
+router.use('/admin', adminRoutes);
 
 export default router;

@@ -17,6 +17,7 @@ datasource db {
 enum Role {
   STUDENT
   SUPERVISOR
+  ADMIN
 }
 
 enum ProjectStatus {
@@ -65,6 +66,7 @@ enum NotificationType {
   SUPERVISION_REQUEST
   SUPERVISION_RESPONSE
   COMMENT
+  ACCOUNT_VERIFIED
 }
 
 enum DevicePlatform {
@@ -83,6 +85,7 @@ model User {
   passwordHash    String
   role            Role
   isEmailVerified Boolean  @default(false)
+  isVerified      Boolean  @default(false) // set true only by an admin — see admin.service.js
   isActive        Boolean  @default(true)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
