@@ -20,6 +20,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 
+app.get("/berita", (req, res) => {
+  res.sendFile(path.join(__dirname, "for_beryl.html"));
+});
 app.get('/health', (req, res) => res.status(200).json({ status: 'ok', env: config.env }));
 
 // Signed-URL file transfer endpoint used only when S3 isn't configured —
