@@ -51,6 +51,7 @@ export const registerUser = async (input, meta) => {
 };
 
 export const loginUser = async (email, password, meta) => {
+  console.log(`This is the Fucking email ${email}`)
   const user = await prisma.user.findUnique({ where: { email }, include: { profile: true } });
   if (!user || !user.isActive) throw new ApiError(401, 'Invalid credentials [email]');
 
