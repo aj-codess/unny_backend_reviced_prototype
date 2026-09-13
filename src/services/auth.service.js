@@ -52,7 +52,7 @@ export const registerUser = async (input, meta) => {
 
 export const loginUser = async (email, password, meta) => {
   const user = await prisma.user.findUnique({ where: { email }, include: { profile: true } });
-  if (!user || !user.isActive) throw new ApiError(401, 'Invalid credentials');
+  if (!user || !user.isActive) throw new ApiError(401, 'Invalid credentials [email]');
 
   const isMatch = await bcrypt.compare(password, user.passwordHash);
   if (!isMatch) throw new ApiError(401, 'Invalid credentials [password]');
