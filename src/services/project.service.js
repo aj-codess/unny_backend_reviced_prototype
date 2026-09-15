@@ -3,6 +3,7 @@ import { ApiError } from '../utils/ApiError.js';
 import { getPagination, buildMeta } from '../utils/pagination.js';
 import { resolveTagIds } from './tag.service.js';
 import { removeObject } from './storage.service.js';
+import { createNotification } from './notification.service.js';
 
 const projectListSelect = {
   id: true,
@@ -193,15 +194,54 @@ export const exploreProjects = async (query) => {
   return { items, meta: buildMeta(page, limit, total) };
 };
 
-export const addComment = async (projectId, authorId, body) => {
-  const project = await prisma.project.findUnique({ where: { id: projectId } });
-  if (!project) throw new ApiError(404, 'Project not found');
 
-  return prisma.comment.create({
+
+ 
+export const addComment = async (projectId, authorId, body) => {
+  const project = await prisma.project.findUnique({
+    where: { id: projectId },
+    select: {
+      title: true,
+      submittedById: true,
+      supervisorId: true,
+      collaborators: { where: { status: 'ACCEPTED' }, select: { userId: true } },
+    },
+  });
+  if (!project) throw new ApiError(404, 'Project not found');
+ 
+  const comment = await prisma.comment.create({
     data: { projectId, authorId, body },
     include: { author: { select: { id: true, profile: { select: { fullName: true, avatarUrl: true } } } } },
   });
+ 
+  // Notify everyone else involved in the project: the owner, the assigned
+  // supervisor (if any), and every accepted collaborator — excluding the
+  // commenter themselves, and de-duplicated in case of overlap (e.g. the
+  // owner is also a collaborator row).
+  const recipientIds = new Set(
+    [project.submittedById, project.supervisorId, ...project.collaborators.map((c) => c.userId)].filter(Boolean),
+  );
+  recipientIds.delete(authorId);
+ 
+  const commenterName = comment.author?.profile?.fullName || 'Someone';
+ 
+  await Promise.all(
+    [...recipientIds].map((userId) =>
+      createNotification({
+        userId,
+        type: 'COMMENT',
+        title: 'New comment',
+        message: `${commenterName} commented on "${project.title}".`,
+        relatedProjectId: projectId,
+      }),
+    ),
+  );
+ 
+  return comment;
 };
+
+
+
 
 export const toggleBookmark = async (projectId, userId) => {
   const existing = await prisma.bookmark.findUnique({ where: { userId_projectId: { userId, projectId } } });
